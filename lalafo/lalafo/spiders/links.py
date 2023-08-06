@@ -3,7 +3,7 @@ from typing import Iterable, Union
 
 
 class LalafoContentSpider(scrapy.Spider):
-    name = 'lalafo_content'
+    name = 'links'
     start_urls = ['https://lalafo.az/azerbaijan/nedvizhimost']
 
     def parse(self, response) -> Iterable[Union[scrapy.Request, scrapy.Item]]:
