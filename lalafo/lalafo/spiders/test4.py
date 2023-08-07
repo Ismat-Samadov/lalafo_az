@@ -11,18 +11,22 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import asyncio
 import aiohttp
+from bs4 import BeautifulSoup
+
 
 class PhoneItem(Item):
     url = Field()
     phone_numbers = Field()
 
+
 class CombinedSpider(CrawlSpider):
-    name = 'test3'
+    name = 'test4'
     allowed_domains = ['lalafo.az']
     start_urls = ['https://lalafo.az/azerbaijan/nedvizhimost']
 
     rules = (
-        Rule(LinkExtractor(allow=(), deny=('/azerbaijan/nedvizhimost',)), callback='parse_item', follow=True, errback='handle_error'),
+        Rule(LinkExtractor(allow=(), deny=('/azerbaijan/nedvizhimost',)), callback='parse_item', follow=True,
+             errback='handle_error'),
     )
 
     def __init__(self):
@@ -73,9 +77,12 @@ class CombinedSpider(CrawlSpider):
             phone_number_responses = await asyncio.gather(*tasks)
 
         for response_text in phone_number_responses:
-            # Parse the response text to extract phone numbers, or handle the case when phone numbers are not found
-            # For example, you can use BeautifulSoup or regular expressions here
-            phone_numbers.append("PHONE_NUMBER_NOT_FOUND")  # Placeholder for demonstration purposes
+            soup = BeautifulSoup(response_text, 'html.parser')
+            phone_number = soup.select_one('.phone-item span')
+            if phone_number:
+                phone_numbers.append(phone_number.text.strip())
+            else:
+                phone_numbers.append("PHONE_NUMBER_NOT_FOUND")
 
         return phone_numbers
 
